@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html></html>
+<head>
+    <title>Frogger game</title>
+    <link rel="stylesheet" href="sammakko.css">
+</head>
+<body>
+    <div id="container">
+        <canvas id="kanveesi"></canvas>
+    </div>
+    
+    <script>
+
+const canvas = document.getElementById("kanveesi");
+const context = canvas.getContext("2d");
+canvas.width = 676;
+canvas.height = 676;
+let peliNopeus = 1;
+let score = 0;
+let lives = 3;
+let autoArray =[];
+let kilpiArray =[];
+let tukkiArray =[];
+
+
+class Player {
+    constructor(playX, playY, movementSpeedX, movementSpeedY, playWidth, playHeight){
+        this.x = playX;
+        this.y = playY;
+        this.movementSpeedX = movementSpeedX;
+        this.movementSpeedY = movementSpeedY;
+        this.width = playWidth;
+        this.height = playHeight;
+    }
+
+    moveUp(){
+        this.y = this.y - this.movementSpeedY;
+    }
+    moveDown(){
+        this.y = this.y + this.movementSpeedY;
+    }
+    moveLeft(){
+        this.x = this.x - this.movementSpeedX;
+
+    }
+    moveRight(){
+        this.x = this.x + this.movementSpeedX;
+    }
+
+    update(){
+        if(this.y < 0) scoredUp();
+
+    }
+    draw(){
+        context.beginPath();
+        context.rect(this.x, this.y, 52, 52);
+        context.fillStyle = 'green';
+        context.fill();
+
+    }
+
+}
+var player = new Player(312, 624, 52, 52, 52, 52);
+
+class autoClass {
+    constructor(autoX, autoY, autoWidth, autoHeight, autoSpeed) {
+        this.x = autoX;
+        this.y = autoY;
+        this.width = autoWidth;
+        this.height = autoHeight;
+        this.speed = autoSpeed;
+    }
+    autoDraw(){
+        context.fillStyle = '#7d0036';
+        context.fillRect(this.x, this.y, this.width, this.height);
+        
+    }
+    collisionCar(player){
+        //collision checking for car and frog
+        if(((this.x + this.width) >= player.x) && 
+        (this.x <= (player.x + player.width)) &&
+        ((this.y + this.height - 1) >= player.y) &&
+        (this.y <= (player.y + player.height - 1))){
+            console.log('hit');
+            deathLiveCount();
+        }        
+    }
+    autoUpdate(){
+        this.x += this.speed * peliNopeus;
+        if(this.speed > 0){
+            if(this.x > canvas.width + this.width){
+            this.x = 0 - this.width;
+            }
+        }else{
+            if(this.x < 0 - this.width){
+                this.x = canvas.width + this.width;
+            }
+        }
+    }
+        
+
+}
+class tukkiClass {
+    constructor(autoX, autoY, autoWidth, autoHeight, autoSpeed) {
+        this.x = autoX;
+        this.y = autoY;
+        this.width = autoWidth;
+        this.height = autoHeight;
+        this.speed = autoSpeed;
+    }
+    tukkiDraw(){
+        context.fillStyle = 'brown';
+        context.fillRect(this.x, this.y, this.width, this.height);
+        
+    }
+    tukkiUpdate(){
+        this.x += this.speed * peliNopeus;
+        if(this.speed > 0){
+            if(this.x > canvas.width + this.width){
+            this.x = 0 - this.width;
+            }
+        }else{
+            if(this.x < 0 - this.width){
+                this.x = canvas.width + this.width;
+            }
+        }
+
+        
+    }
+}
+class kilpiClass {
+    constructor(autoX, autoY, autoWidth, autoHeight, autoSpeed) {
+        this.x = autoX;
+        this.y = autoY;
+        this.width = autoWidth;
+        this.height = autoHeight;
+        this.speed = autoSpeed;
+    }
+    kilpiDraw(){
+        context.fillStyle = '#12b039';
+        context.fillRect(this.x, this.y, this.width, this.height);
+        
+    }
+    kilpiUpdate(){
+        this.x += this.speed * peliNopeus;
+        if(this.speed > 0){
+            if(this.x > canvas.width + this.width){
+            this.x = 0 - this.width;
+            }
+        }else{
+            if(this.x < 0 - this.width){
+                this.x = canvas.width + this.width;
+            }
+        }
+
+        
+    }
+}
+
+function esteSiirto(){
+    //kaista 1 
+    for (let i = 0; i < 4; i++){
+    let Tila = i * 200
+    autoArray.push(new autoClass(Tila, canvas.height - 52*2, 52*1.5, 52, -1));
+        
+    }
+    //kaista 2 
+    for (let i = 0; i < 2; i++){
+    let Tila = i * 400
+    autoArray.push(new autoClass(Tila, canvas.height - 52*3, 52*5, 52, 2));
+        
+    }
+    //kaista 3 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 400
+    autoArray.push(new autoClass(Tila, canvas.height - 52*4, 52*4, 52, -2));
+        
+    }
+    //kaista 4 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 300
+    autoArray.push(new autoClass(Tila, canvas.height - 52*5, 52*2, 52, 2));
+        
+    }
+    //kaista 5 
+    for (let i = 0; i < 4; i++){
+    let Tila = i * 200
+    autoArray.push(new autoClass(Tila, canvas.height - 52*6, 52*1, 52, -3.5));
+        
+    }
+    //joki 1 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 100
+    kilpiArray.push(new kilpiClass(Tila, canvas.height - 52*8, 52*1.5, 52, -1));
+        
+    }
+    //joki 2 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 200
+    tukkiArray.push(new tukkiClass(Tila, canvas.height - 52*9, 52*3, 52, 1.5));
+        
+    }
+    //joki 3 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 200
+    tukkiArray.push(new tukkiClass(Tila, canvas.height - 52*10, 52*3, 52, -1.5));
+        
+    }
+    //joki 4 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 100
+    kilpiArray.push(new kilpiClass(Tila, canvas.height - 52*11, 52*1.5, 52, 1));
+        
+    }
+    //joki 5 
+    for (let i = 0; i < 3; i++){
+    let Tila = i * 200
+    tukkiArray.push(new tukkiClass(Tila, canvas.height - 52*12, 52*3, 52, -1.5));
+        
+    }
+
+    
+}
+
+esteSiirto();
+
+function estePiirto() {
+    for (let i = 0; i < autoArray.length; i++) {
+        autoArray[i].autoUpdate();
+        autoArray[i].autoDraw();
+        autoArray[i].collisionCar(player);
+    }
+    for (let i = 0; i < tukkiArray.length; i++) {
+        tukkiArray[i].tukkiUpdate();
+        tukkiArray[i].tukkiDraw();
+    }
+    for (let i = 0; i < kilpiArray.length; i++) {
+        kilpiArray[i].kilpiUpdate();
+        kilpiArray[i].kilpiDraw();
+    }
+
+}
+
+
+
+
+function updateScreen(){
+    // clear screen
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+
+estePiirto();
+scoredDraw();
+livesDraw();
+player.update();
+player.draw();
+
+    window.requestAnimationFrame(updateScreen);        
+}
+window.requestAnimationFrame(updateScreen);
+
+
+
+
+
+
+
+window.addEventListener('keydown', function(event){
+switch(event.keyCode){
+    case 38:
+        player.moveUp();
+        break;
+    case 37: 
+        player.moveLeft();
+        break;
+    case 40: 
+        player.moveDown();
+        break;
+    case 39:
+        player.moveRight();
+        break;
+}
+});
+window.addEventListener('keydown', function(event){
+
+switch(event.keyCode){
+    case 87:
+        player.moveUp();
+        break;
+    case 65: 
+        player.moveLeft();
+        break;
+    case 83: 
+        player.moveDown();
+        break;
+    case 68:
+        player.moveRight();
+        break;
+}
+});
+
+function scoredUp() {
+    score += 10;
+    peliNopeus += 0.05;
+    player.x = 312;
+    player.y = 624;
+}
+function scoredDraw() {
+    context.fillStyle = 'black';
+    context.strokeStyle = 'black';
+    context.font = '17px sans-serif ';
+    context.strokeText('Score:', 22, 20);
+    context.font = '22px sans-serif';
+    context.fillText(score, 72, 22);
+}
+/*function scoredDrawEnd() {
+    context.fillStyle = 'black';
+    context.strokeStyle = 'black';
+    context.font = '177px sans-serif ';
+    context.strokeText('Total Score:', 312, 312)
+    context.font = '222px sans-serif';
+    context.fillText(score, 312, 312)
+}*/
+
+function deathLiveCount() {
+    lives -= 1;
+    player.x = 312;
+    player.y = 624;
+    zeroLives();
+}
+function zeroLives() {
+    if(lives == 0) {
+    alert('Your total score is' + ' ' + score);
+    player.x = 312;
+    player.y = 624;
+    lives = 3;
+    score = 0;
+    peliNopeus = 1;
+    //scoredDrawEnd();
+    }
+}
+function livesDraw() {
+    context.fillStyle = 'black';
+    context.strokeStyle = 'black';
+    context.font = '17px sans-serif ';
+    context.strokeText('Lives:', 22, 40)
+    context.font = '22px sans-serif';
+    context.fillText(lives, 72, 42)
+}
+
+    </script>
+</body>

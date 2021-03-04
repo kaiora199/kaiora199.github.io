@@ -1,0 +1,6 @@
+#container {
+    position: absolute;
+    background-image: url(../background.png);
+    width: 676px;
+    height: 676px;
+ }
