@@ -11,6 +11,8 @@
     
     <script>
 
+//global variables
+
 const canvas = document.getElementById("kanveesi");
 const context = canvas.getContext("2d");
 canvas.width = 676;
@@ -21,9 +23,11 @@ let lives = 3;
 let autoArray =[];
 let kilpiArray =[];
 let tukkiArray =[];
+let floating = false;
 
+//player class, constructor and functions
 
-class Player {
+class PlayerClass {
     constructor(playX, playY, movementSpeedX, movementSpeedY, playWidth, playHeight){
         this.x = playX;
         this.y = playY;
@@ -35,32 +39,47 @@ class Player {
 
     moveUp(){
         this.y = this.y - this.movementSpeedY;
+        floating = false;
     }
     moveDown(){
         this.y = this.y + this.movementSpeedY;
+        floating = false;
     }
     moveLeft(){
         this.x = this.x - this.movementSpeedX;
+        floating = false;
 
     }
     moveRight(){
         this.x = this.x + this.movementSpeedX;
+        floating = false;
     }
 
-    update(){
-        if(this.y < 0) scoredUp();
+    playerUpdate(){
+        if(this.y < 52) scoredUp();
 
     }
-    draw(){
+    playerDraw(){
         context.beginPath();
         context.rect(this.x, this.y, 52, 52);
         context.fillStyle = 'green';
         context.fill();
 
     }
+    //364
+    riverCollision(){
+        if(this.y < 312 && this.y > 52 && !floating){
+            deathLiveCount();
+        }
+    }
 
 }
-var player = new Player(312, 624, 52, 52, 52, 52);
+
+//creating the player
+
+var player = new PlayerClass(312, 624, 52, 52, 52, 52);
+
+//car class, constructor and functions
 
 class autoClass {
     constructor(autoX, autoY, autoWidth, autoHeight, autoSpeed) {
@@ -81,7 +100,6 @@ class autoClass {
         (this.x <= (player.x + player.width)) &&
         ((this.y + this.height - 1) >= player.y) &&
         (this.y <= (player.y + player.height - 1))){
-            console.log('hit');
             deathLiveCount();
         }        
     }
@@ -100,6 +118,9 @@ class autoClass {
         
 
 }
+
+//log class, constructor and functions
+
 class tukkiClass {
     constructor(autoX, autoY, autoWidth, autoHeight, autoSpeed) {
         this.x = autoX;
@@ -127,7 +148,20 @@ class tukkiClass {
 
         
     }
+    collisionLog(player){
+        //collision checking for car and frog
+        if(((this.x + this.width) >= player.x) && 
+        (this.x <= (player.x + player.width)) &&
+        ((this.y + this.height - 1) >= player.y) &&
+        (this.y <= (player.y + player.height - 1))){
+            player.x = player.x + this.speed * peliNopeus;
+            floating = true;
+        }        
+    }
 }
+
+//turtle class, constructor and functions
+
 class kilpiClass {
     constructor(autoX, autoY, autoWidth, autoHeight, autoSpeed) {
         this.x = autoX;
@@ -155,64 +189,76 @@ class kilpiClass {
 
         
     }
+    collisionTurtle(player){
+        //collision checking for car and frog
+        if(((this.x + this.width) >= player.x) && 
+        (this.x <= (player.x + player.width)) &&
+        ((this.y + this.height - 1) >= player.y) &&
+        (this.y <= (player.y + player.height - 1))){
+            player.x = player.x + this.speed * peliNopeus;
+            floating = true;
+        }        
+    }
 }
 
+// function for moving the obstacles to their arrays for each lane separately
+
 function esteSiirto(){
-    //kaista 1 
-    for (let i = 0; i < 4; i++){
+    //lane 1, left
+    for (let i = 0; i < 3; i++){
     let Tila = i * 200
     autoArray.push(new autoClass(Tila, canvas.height - 52*2, 52*1.5, 52, -1));
         
     }
-    //kaista 2 
+    //lane 2 right
     for (let i = 0; i < 2; i++){
     let Tila = i * 400
-    autoArray.push(new autoClass(Tila, canvas.height - 52*3, 52*5, 52, 2));
+    autoArray.push(new autoClass(Tila, canvas.height - 52*3, 52*4, 52, 2));
         
     }
-    //kaista 3 
+    //lane 3 left
     for (let i = 0; i < 3; i++){
     let Tila = i * 400
-    autoArray.push(new autoClass(Tila, canvas.height - 52*4, 52*4, 52, -2));
+    autoArray.push(new autoClass(Tila, canvas.height - 52*4, 52*3, 52, -2));
         
     }
-    //kaista 4 
+    //lane 4 right
     for (let i = 0; i < 3; i++){
     let Tila = i * 300
     autoArray.push(new autoClass(Tila, canvas.height - 52*5, 52*2, 52, 2));
         
     }
-    //kaista 5 
-    for (let i = 0; i < 4; i++){
+    //lane 5 left 
+    for (let i = 0; i < 3; i++){
     let Tila = i * 200
     autoArray.push(new autoClass(Tila, canvas.height - 52*6, 52*1, 52, -3.5));
         
     }
-    //joki 1 
+    //river 1 left
     for (let i = 0; i < 3; i++){
     let Tila = i * 100
     kilpiArray.push(new kilpiClass(Tila, canvas.height - 52*8, 52*1.5, 52, -1));
         
     }
-    //joki 2 
+    //river 2 right 
     for (let i = 0; i < 3; i++){
     let Tila = i * 200
     tukkiArray.push(new tukkiClass(Tila, canvas.height - 52*9, 52*3, 52, 1.5));
         
     }
-    //joki 3 
+    //river 3 left
     for (let i = 0; i < 3; i++){
     let Tila = i * 200
     tukkiArray.push(new tukkiClass(Tila, canvas.height - 52*10, 52*3, 52, -1.5));
         
     }
-    //joki 4 
+    //river 4 right
     for (let i = 0; i < 3; i++){
     let Tila = i * 100
     kilpiArray.push(new kilpiClass(Tila, canvas.height - 52*11, 52*1.5, 52, 1));
         
     }
-    //joki 5 
+    //river 5 left
     for (let i = 0; i < 3; i++){
     let Tila = i * 200
     tukkiArray.push(new tukkiClass(Tila, canvas.height - 52*12, 52*3, 52, -1.5));
@@ -222,7 +268,11 @@ function esteSiirto(){
     
 }
 
+//moving obstacles to their arrays 
+
 esteSiirto();
+
+//function for reading the arrays for obstacles and drawing them
 
 function estePiirto() {
     for (let i = 0; i < autoArray.length; i++) {
@@ -233,37 +283,42 @@ function estePiirto() {
     for (let i = 0; i < tukkiArray.length; i++) {
         tukkiArray[i].tukkiUpdate();
         tukkiArray[i].tukkiDraw();
+        tukkiArray[i].collisionLog(player);
     }
     for (let i = 0; i < kilpiArray.length; i++) {
         kilpiArray[i].kilpiUpdate();
         kilpiArray[i].kilpiDraw();
+        kilpiArray[i].collisionTurtle(player);
     }
 
 }
 
 
 
+//screenrefresher, animating and drawing objects, collision checking for rives
+// and printing lives and score
 
-function updateScreen(){
-    // clear screen
+function gameUpdateScreen(){
     context.clearRect(0, 0, canvas.width, canvas.height);
 
 
 estePiirto();
+player.riverCollision();
 scoredDraw();
 livesDraw();
-player.update();
-player.draw();
+player.playerUpdate();
+player.playerDraw();
 
-    window.requestAnimationFrame(updateScreen);        
+    window.requestAnimationFrame(gameUpdateScreen);        
 }
-window.requestAnimationFrame(updateScreen);
+window.requestAnimationFrame(gameUpdateScreen);
 
 
 
 
 
 
+//keyboard controls for arrow keys and wasd keys 
 
 window.addEventListener('keydown', function(event){
 switch(event.keyCode){
@@ -299,12 +354,15 @@ switch(event.keyCode){
 }
 });
 
+//functions for scoring, frog death counting, drawing scores and lives and ending the game
+
 function scoredUp() {
     score += 10;
     peliNopeus += 0.05;
     player.x = 312;
     player.y = 624;
 }
+
 function scoredDraw() {
     context.fillStyle = 'black';
     context.strokeStyle = 'black';
@@ -313,14 +371,6 @@ function scoredDraw() {
     context.font = '22px sans-serif';
     context.fillText(score, 72, 22);
 }
-/*function scoredDrawEnd() {
-    context.fillStyle = 'black';
-    context.strokeStyle = 'black';
-    context.font = '177px sans-serif ';
-    context.strokeText('Total Score:', 312, 312)
-    context.font = '222px sans-serif';
-    context.fillText(score, 312, 312)
-}*/
 
 function deathLiveCount() {
     lives -= 1;
@@ -328,6 +378,7 @@ function deathLiveCount() {
     player.y = 624;
     zeroLives();
 }
+
 function zeroLives() {
     if(lives == 0) {
     alert('Your total score is' + ' ' + score);
@@ -336,9 +387,9 @@ function zeroLives() {
     lives = 3;
     score = 0;
     peliNopeus = 1;
-    //scoredDrawEnd();
     }
 }
+
 function livesDraw() {
     context.fillStyle = 'black';
     context.strokeStyle = 'black';
